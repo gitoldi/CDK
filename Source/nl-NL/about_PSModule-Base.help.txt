@@ -1,0 +1,20 @@
+TOPIC
+    about_PSModule-Personal
+
+SHORT DESCRIPTION
+    Een persoonlijke module.
+
+LONG DESCRIPTION
+    Dit project is gestart om een persoonlijke module te maken met behulp van 
+    GitHub (https://github.com/) en de voorgestelde ModuleBuilder (https://github.com/PoshCode/ModuleBuilder) 
+    manier van werken.
+
+    - De module bevat een aantal scripts die handig kunnen zijn.
+    - Sommige scripts zijn gebaseerd op tips & tricks van andere scripters wat in het script aangegeven wordt.
+    - Voor meer details zie:
+        - https://github.com/gitoldi/PSModule-Personal
+        - En gebruik 'Get-Help <command>' bij de individuele scripts.
+
+
+KEYWORDS
+      PowerShell, Module, Tools, personal
