@@ -1,6 +1,6 @@
 @{
-    Path = "PSModule.Base.psd1"
-    OutputDirectory = "$( $env:OneDrive )\Modules\PSModule.Base"
+    Path = "CultuurhuysDeKroon.psd1"
+    OutputDirectory = "$( $env:OneDrive )\Modules\CultuurhuysDeKroon"
     VersionedOutputDirectory = $true
-    CopyDirectories = @( 'en-US', 'nl-NL', 'tests' )
+    CopyDirectories = @( 'nl-NL', 'tests' )
 }

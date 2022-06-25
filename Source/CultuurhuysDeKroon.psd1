@@ -3,7 +3,7 @@
     RootModule             = 'CultuurhuysDeKroon.psm1'
 
     # The module version should be SemVer.org compatible
-    ModuleVersion          = "0.1.0"
+    ModuleVersion          = "0.2.0"
 
     # ID used to uniquely identify this module
     # GUID created 220624 MR.
@@ -11,7 +11,7 @@
     Description            = 'Een module voor Cultuurhuys De Kroon.'
 
     # Common stuff for all our modules:
-    CompanyName            = 'Privé'
+    CompanyName            = 'Prive'
     Author                 = 'Marcel Rijsbergen'
     Copyright              = "Copyright 2018 - today, Marcel Rijsbergen"
 

@@ -1,55 +1,51 @@
-﻿function Find-DuplicateFiles {
+﻿function Use-Template {
     <#
 
     .SYNOPSIS
-    Find duplicate files.
+    Sjabloon bestand.
 
     .DESCRIPTION
-    Find duplicate files.
+    Sjabloon bestand.
 
-    .PARAMETER Path
-    The folder where the script will start to show the tree.
-    Default: current location.
+    Een sjabloon gemaakt als begin voor nieuwe scripts.
+    Deze kopieren naar een nieuw bestand en die dan bewerken.
+
+    .PARAMETER xxx
+    Beschrijf de parameters die je gebruikt in je script.
 
     .PARAMETER Version
-    Show the current version of the script and stop executing.
+    Deze parameter gebruik ik altijd in mijn scripts om per script de versie op te kunnen vragen.
+    Als deze is opgezet wordt dit ook goed gebruikt door mijn versie van 'Get-Command -module <modulenaam>' 
+    namelijk 'Get-CommandVersion -module 'modulenaam'.
 
     .EXAMPLE
-    C:\> .\Find-DuplicateFiles.ps1
+    C:\> .\Use-Template.ps1
 
     .INPUTS
-    The parameters, see 'Get-Help -Detailed'
+    Anderen dan de 'PARAMETERS'.
 
     .OUTPUTS
-    All files that seem to have duplicates.
-    A 'PSCustomObject'.
+    Wat er als resultaat beschikbaar is als het script is gebruikt.
+    Bijvoorbeeld:
+    - HTML bestand.
+    - Log bestand.
+    - Een 'PSCustomObject'.
 
     .LINK
-    https://social.technet.microsoft.com/wiki/contents/articles/52270.windows-powershell-how-to-find-duplicate-files.aspx
-
-    .LINK
-    https://stackoverflow.com/questions/49666204/powershell-to-display-duplicate-files
+    https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help?view=powershell-7.2
 
     .NOTES
-    Name    : Find-DuplicateFiles
-    Author  : Marcel Rijsbergen
-    History :
+    Name    : Use-Template
+    Author  : <Auteur>
+    Historie:
 
-    220509 - 0.2.1 MR
-    - When started without parameters, tell user it may take some time.
-    - Added property 'Duplicates' to return object.
-    - Added parameter 'Display' to show output during execution.
+    220625 - 0.2.0 MR
+    - Type foutjes aangepast.
+    - Kleine aanpassingen.
 
-    220407 - 0.2.0 MR
-    - Link 2 - Found an example using 'Get-FileHash' which i though of to start with.
-    - Removed the 'length' solution started with in 0.1.0.    
-
-    220407 - 0.1.0 - MR
-    - MR (Marcel Rijsbergen)
-    - Started with some pointers. See the 'LINKS' in 'Get-Help' for this script.
-    - Used (auto) 'Align' here and there.
-    - Started with parameters: Path, Version
-    - Link 1 - only on file length, tested, works but not usefull. File length can be the same but contents can differ.
+    220624 - 0.1.0 MR
+    - 220624 is JJMMDD.
+    - De eerste versie van het sjabloon bestand.
     #>
 
     #region 'Initialization.'
@@ -59,16 +55,13 @@
         [string] $Path = $env:USERPROFILE
         ,
         [Parameter(Mandatory = $false)]
-        [switch] $Display = $false
-        ,
-        [Parameter(Mandatory = $false)]
         [switch] $Version = $false
     )
     $ScriptName = [io.path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Name)
     Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Begin."
 
     Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Test if parameter 'Version' is supplied."
-    [Version] $ScriptVersion = '0.2.1'
+    [Version] $ScriptVersion = '0.2.0'
     if ($Version) {
         Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Version: $($ScriptVersion)"
         return $ScriptVersion
@@ -77,75 +70,32 @@
 
     #region 'Define variables.'
     Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Define variables."
-    $ConfigFile         = Join-Path -Path $FolderConfig -ChildPath "$($ScriptName).psd1"
-    $ReturnData         = @()
-    $ReturnError        = @()
-    #$Path              = '\\PDC\Shared\Accounting' #define path to folders to find duplicate files
-    $Counter            = 0
-    $MatchedSourceFiles = @()
+    $FilesAll           = @{}
+    $FilesTotal         = $FilesAll.Count
     #endregion 'Define variables.'
 
     #region 'Main.'
+    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Begin."
 
     #region 'Test parameter PATH'.
-    if (-not $Path) {
-        Write-Warning -Message "$(Get-TimeStamp) $($ScriptName) Parameter 'PATH' not supplied, using 'USERPROFILE' will take time!"
+    if (Test-Path $Path -ErrorAction SilentlyContinue) {
+        Write-Host -Object "$(Get-TimeStamp) $($ScriptName) List files from: $($Path)"
+        $FilesAll           = Get-ChildItem -File -Recurse -path $Path
+        $FilesTotal         = $FilesAll.Count
+        Write-Host -Object "$(Get-TimeStamp) $($ScriptName) Files found    # $($FilesTotal)"    
+    }
+    else {
+        Write-Warning -Message "$(Get-TimeStamp) $($ScriptName) Parameter 'PATH' not supplied."
     }
     #endregion 'Test parameter PATH'.
     
-    Write-Host -Object "$(Get-TimeStamp) $($ScriptName) List files from: $($Path)"
-    $FilesAll           = Get-ChildItem -File -Recurse -path $Path
-    $FilesTotal         = $FilesAll.Count
-    Write-Host -Object "$(Get-TimeStamp) $($ScriptName) Files to test  # $($FilesTotal)"
-
-    # Group all files based on length and only get files where count is greater than 1.
-    # After all if length is different the hash will be different anyway.
-    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Group all files based on length. Save when count > 1."
-    $MatchLength = $FilesAll |
-        Group-Object -Property Length |
-        Where-Object {$_.Count -gt 1} |
-        ForEach-Object {$_.Group}
-    
-    # Get-FileHash for the remaining files.
-    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Group all files with same length on file hash. Save when count > 1."
-    $MatchHash = $MatchLength |
-        Get-FileHash |
-        Group-Object -Property Hash |
-        Where-Object {$_.Count -gt 1} |
-        ForEach-Object {$_.Group}
-    
-    # Now sort on hash and get unique values. For each value show the files.
-    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Sort on hash. Save only unique ones. Find files with same hash."
-    $UniqueHash = $MatchHash | Sort-Object -Property Hash -Unique | Select-Object -Property Hash
-    foreach ($TmpRecord in $UniqueHash) {
-        $TmpHash = $TmpRecord.Hash
-        if ($Display) {Write-Host -Object "Hash: $($TmpHash)"}
-        $TmpFiles = $MatchHash | Where-Object {$_.Hash -match $TmpHash}
-        $TmpHashFiles = @{
-            Hash  = $TmpHash
-            Files = $TmpFiles.Path
-        }
-        $ReturnData += $TmpHashFiles
-        if ($Display) {
-            foreach ($TmpFile in $TmpFiles) {
-                Write-Host -Object "`tFile: $($TmpFile.Path)"
-            }
-        }
-    }
-
-    #$MatchedSourceFiles
-    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Found matching files # $($ReturnData.Count)"
     #endregion 'Main.'
 
     #region 'Finished.'
     [PSCustomObject]@{
-        FilesAll    = $FilesAll
-        MatchLength = $MatchLength
-        MatchHash   = $MatchHash
-        UniqueHash  = $UniqueHash
-        Duplicates  = $ReturnData
-        Errors      = $ReturnError
+        FilesAll   = $FilesAll
+        FilesTotal = $FilesTotal
     }
-    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Finished."
+    Write-Verbose -Message "$(Get-TimeStamp) $($ScriptName) Einde."
     #endregion 'Finished.'
 }
