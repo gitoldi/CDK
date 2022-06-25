@@ -11,7 +11,7 @@
     Description            = 'Een module voor Cultuurhuys De Kroon.'
 
     # Common stuff for all our modules:
-    CompanyName            = 'Privé'
+    CompanyName            = 'Prive'
     Author                 = 'Marcel Rijsbergen'
     Copyright              = "Copyright 2018 - today, Marcel Rijsbergen"
 

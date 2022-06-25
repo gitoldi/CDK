@@ -1,40 +1,50 @@
-﻿# Pester file for module: PSModule-Base
+﻿# Pester file for module: CultuurhuysDeKroon
 # Used Pester test file as a start.
 # Removed some specific Pester stuff.
 #
+[CmdletBinding()]
+param ()
+
+#
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ScriptRoot = Split-Path -Parent $ScriptRoot
-$ScriptName = [ io.path ]::GetFileNameWithoutExtension( $myinvocation.mycommand.name ) 
+$ScriptName = [io.path]::GetFileNameWithoutExtension($myinvocation.mycommand.name)
 $CurModuleName = $ScriptName -replace '.tests',''
 $WHColor = @{
     ForegroundColor = 'Magenta'
     BackgroundColor = 'Black'
 }
-Write-Host -Object "`t-> ScriptRoot : $($ScriptRoot)" @WHColor
-Write-Host -Object "`t-> ScriptName : $($ScriptName)" @WHColor
-$manifestPath  = ( Join-Path $ScriptRoot "$($CurModuleName).psd1" )
-$changeLogPath = ( Join-Path $ScriptRoot 'CHANGELOG.md' )
+Write-Host -Object "`t-> ScriptRoot   : $($ScriptRoot)" @WHColor
+Write-Host -Object "`t-> ScriptName   : $($ScriptName)" @WHColor
+Write-Host -Object "`t-> CurModuleName: $($CurModuleName)" @WHColor
+
+# Get Manifest and CHANGELOG.
+$manifestPath  = (Join-Path -Path $ScriptRoot -ChildPath "$($CurModuleName).psd1")
+$changeLogPath = (Join-Path -Path $ScriptRoot -ChildPath 'CHANGELOG.md')
+Write-Host -Object "`t-> Manifest path: $($manifestPath)" @WHColor
+Write-Host -Object "`t-> CHANGELOG    : $($changeLogPath)" @WHColor
 
 # DO NOT CHANGE THIS TAG NAME; IT AFFECTS THE CI BUILD.
 
+#TODO - Pester file not working properly yet.
 Describe -Tags 'VersionChecks' "$($CurModuleName) manifest and changelog" {
     $script:manifest = $null
-    It "Has a valid manifest" {
-        {
+    It "Has a valid manifest" {{
             $script:manifest = Test-ModuleManifest -Path $manifestPath -ErrorAction Stop -WarningAction SilentlyContinue
-        } | Should Not Throw
+            $script:manifest | Get-Member
+        } | Should -Not Throw
     }
 
     It "Has a valid name in the manifest" {
-        $script:manifest.Name | Should Be $CurModuleName
+        $script:manifest.Name | Should -Be $CurModuleName
     }
 
     It "Has a valid guid in the manifest" {
-        $script:manifest.Guid | Should Be '71156bb5-6c15-415a-8b21-7bdfe5a01061'
+        $script:manifest.Guid | Should -Be '729f147f-f301-4d49-ad25-f82bc8626778'
     }
 
     It "Has a valid version in the manifest" {
-        $script:manifest.Version -as [Version] | Should Not BeNullOrEmpty
+        $script:manifest.Version -as [Version] | Should -Not BeNullOrEmpty
     }
 
     $script:changelogVersion = $null
@@ -46,12 +56,12 @@ Describe -Tags 'VersionChecks' "$($CurModuleName) manifest and changelog" {
                 break
             }
         }
-        $script:changelogVersion                | Should Not BeNullOrEmpty
-        $script:changelogVersion -as [Version]  | Should Not BeNullOrEmpty
+        $script:changelogVersion                | Should -Not BeNullOrEmpty
+        $script:changelogVersion -as [Version]  | Should -Not BeNullOrEmpty
     }
 
     It "Changelog and manifest versions are the same" {
-        $script:changelogVersion -as [Version] | Should be ( $script:manifest.Version -as [Version] )
+        $script:changelogVersion -as [Version] | Should -Be ( $script:manifest.Version -as [Version] )
     }
 
     if ( Get-Command git.exe -ErrorAction SilentlyContinue ) {
@@ -66,15 +76,14 @@ Describe -Tags 'VersionChecks' "$($CurModuleName) manifest and changelog" {
                 $script:tagVersion = $matches[1]
             }
 
-            $script:tagVersion                  | Should Not BeNullOrEmpty
-            $script:tagVersion -as [Version]    | Should Not BeNullOrEmpty
+            $script:tagVersion                  | Should -Not BeNullOrEmpty
+            $script:tagVersion -as [Version]    | Should -Not BeNullOrEmpty
         }
 
         It "Github and local version are the same" -skip:$skipVersionTest {
-            $script:changelogVersion -as [Version] | Should be ( $script:manifest.Version -as [Version] )
-            $script:manifest.Version -as [Version] | Should be ( $script:tagVersion -as [Version] )
+            $script:changelogVersion -as [Version] | Should -Be ( $script:manifest.Version -as [Version] )
+            $script:manifest.Version -as [Version] | Should -Be ( $script:tagVersion -as [Version] )
         }
-
     }
 }
 
@@ -83,16 +92,16 @@ if ( $PSVersionTable.PSVersion.Major -ge 3 ) {
     Describe 'Clean treatment of the $error variable' {
         Context 'A Context' {
             It 'Performs a successful test' {
-                $true | Should Be $true
+                $true | Should -Be $true
             }
         }
 
         It 'Did not add anything to the $error variable' {
-            $error.Count | Should Be 0
+            $error.Count | Should -Be 0
         }
     }
 
-    InModuleScope PSModule-Base {
+    InModuleScope CultuurhuysDeKroon {
         Describe 'SafeCommands table' {
             $path = $ExecutionContext.SessionState.Module.ModuleBase
             #$filesToCheck = Get-ChildItem -Path $path -Recurse -Include *.ps1,*.psm1 -Exclude *.Tests.ps1
@@ -118,7 +127,7 @@ if ( $PSVersionTable.PSVersion.Major -ge 3 ) {
             $missingSafeCommands = $uniqueSafeCommands | Where-Object { -not $script:SafeCommands.ContainsKey($_) }
 
             It 'The SafeCommands table contains all commands that are called from the module' {
-                $missingSafeCommands | Should Be $null
+                $missingSafeCommands | Should -Be $null
             }
         }
     }
@@ -192,7 +201,7 @@ Describe 'Testing if all functions have a corresponding pester file.' {
         $CmdTest = $CurCommand.Name + '.Tests.ps1'
         It "Find 'Pester' test file: $($CmdTest)" {
             $CmdFound = Get-ChildItem -Recurse -Filter "$($CmdTest)"
-            $CmdFound | Should Be $true
+            $CmdFound | Should -Be $true
         }
     }
 
@@ -210,7 +219,7 @@ Describe 'Testing if all functions have a corresponding pester file.' {
             $FuncTxt += "C:\Program Files\WindowsPowerShell\Modules;"
             $FuncTxt += "C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules;"
             $FuncTxt += "C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell"
-            $env:PSModulePath.ToLower() | Should BeExactly $FuncTxt.ToLower()
+            $env:PSModulePath.ToLower() | Should -BeExactly $FuncTxt.ToLower()
         }
         #endregion Desktop
 
@@ -223,7 +232,7 @@ Describe 'Testing if all functions have a corresponding pester file.' {
             $FuncTxt += "C:\Program Files\WindowsPowerShell\Modules;"
             $FuncTxt += "C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules;"
             $FuncTxt += "C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell"
-            $env:PSModulePath.ToLower() | Should BeExactly $FuncTxt.ToLower()
+            $env:PSModulePath.ToLower() | Should -BeExactly $FuncTxt.ToLower()
         }
         #endregion Core
     }
@@ -248,47 +257,16 @@ Describe 'Testing if all functions have a corresponding pester file.' {
             $FuncTxt += "Get-TestMe: 5 - This is a test"
             $FuncTxt += "Get-TestMe: 6 - This is a test"
             $getFunc = Get-TestMe
-            $getFunc | Should beExactly $FuncTxt
+            $getFunc | Should -BeExactly $FuncTxt
         }
     }
 
-    Context 'Function : Convert-Bytes' {
-        It 'Test function : Convert-Bytes Byte and KiloByte' {
-            (Convert-Bytes  999).Value | Should BeExactly '999,00'
-            (Convert-Bytes  999).Metric | Should BeExactly 'B = Byte'
-            (Convert-Bytes 1000).Value | Should BeExactly '1,00'
-            (Convert-Bytes 1000).Metric | Should BeExactly 'KB = KiloByte'
-            (Convert-Bytes 1004).Value | Should BeExactly '1,00'
-            (Convert-Bytes 1004).Metric | Should BeExactly 'KB = KiloByte'
-            (Convert-Bytes 1006).Value | Should BeExactly '1,01'
-            (Convert-Bytes 1006).Metric | Should BeExactly 'KB = KiloByte'
-            (Convert-Bytes  999994).Value | Should BeExactly '999,99'
-            (Convert-Bytes  999994).Metric | Should BeExactly 'KB = KiloByte'
-            (Convert-Bytes  999995).Value | Should BeExactly '1.000,00'
-            (Convert-Bytes  999995).Metric | Should BeExactly 'KB = KiloByte'
-        }
-        It 'Test function : Convert-Bytes MegaByte' {
-            (Convert-Bytes 1000000).Value | Should BeExactly '1,00'
-            (Convert-Bytes 1000000).Metric | Should BeExactly 'MB = MegaByte'
-            (Convert-Bytes  999994999).Value | Should BeExactly '999,99'
-            (Convert-Bytes  999994999).Metric | Should BeExactly 'MB = MegaByte'
-            (Convert-Bytes  999995000).Value | Should BeExactly '1.000,00'
-            (Convert-Bytes  999995000).Metric | Should BeExactly 'MB = MegaByte'
-            (Convert-Bytes 1000000000).Value | Should BeExactly '1,00'
-        }
-        It 'Test function : Convert-Bytes GigaByte'{
-            (Convert-Bytes 1000000000).Metric | Should BeExactly 'GB = GigaByte'
-
-            #Convert-Bytes  999994999999 | Should BeExactly '999,99 TB'
-            #Convert-Bytes  999995000000 | Should BeExactly '1.000,00 TB'
-            #Convert-Bytes 1000000000000 | Should BeExactly '1,00 PB'
-
-            # tested on PS command: "{0:N2}" -f ( 999994999999999 / $CurpB )
-            #Convert-Bytes  999994999999999 | Should BeExactly '999,99 TB'
-            # tested on PS command: "{0:N2}" -f ( 999995000000000 / $CurpB )
-            #Convert-Bytes  999995000000000 | Should BeExactly '1.000,00 PB'
-            # tested on PS command: "{0:N2}" -f ( 1000000000000000 / $CurEB )
-            #Convert-Bytes 1000000000000000 | Should BeExactly '1,00 EB'
+    Context 'Function: Use-Template (Template example PS1 file.' {
+        if (Get-Command -Name 'Use-Template' -ErrorAction SilentlyContinue) {
+            $CDKPesterT0 = Use-Template
+            It 'Test function : Use-Template' {
+                $CDKPesterT0.FilesAll.Count | Should -Be $CDKPesterT0.FilesTotal
+            }
         }
     }
 
