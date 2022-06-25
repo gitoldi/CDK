@@ -100,7 +100,7 @@ if ($IsVerbose) {Write-Output -InputObject "$(Get-TimeStamp) $($ScriptName) INFO
 $Curdir = Get-Location
 if ($IsVerbose) {Write-Output -InputObject "$(Get-TimeStamp) $ScriptName INFO Current folder : $($curdir)"}
 $ConfigFile = $FolderConfig + '\Config-' + $ScriptName + '.psd1'
-$ConfigName = $ScriptName -replace '[-_]',''
+$ConfigName = $ScriptName -replace '-','' -replace '_]','' -replace ' ',''
 if ($IsVerbose) {Write-Output -InputObject "$(Get-TimeStamp) $ScriptName INFO Try Config file : $($ConfigFile)"}
 if ($IsVerbose) {Write-Output -InputObject "$(Get-TimeStamp) $ScriptName INFO Set Config variable : $($ConfigName)"}
 if (Test-Path $ConfigFile ) {
@@ -172,3 +172,5 @@ if (Test-Path $ConfigFile ) {
     }
 }
 #EndRegion 'Test for config and read it.'
+
+#TODO Pester test nog werkend maken dan een 1e versie klaar.

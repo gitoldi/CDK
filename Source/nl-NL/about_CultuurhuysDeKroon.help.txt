@@ -1,20 +1,20 @@
 TOPIC
-    about_PSModule-Personal
+    about_CultuurhuysDeKroon
 
 SHORT DESCRIPTION
-    Een persoonlijke module.
+    Een module voor Cultuurhuys De Kroon.
 
 LONG DESCRIPTION
-    Dit project is gestart om een persoonlijke module te maken met behulp van 
+    Dit project is gestart om een module te maken met behulp van 
     GitHub (https://github.com/) en de voorgestelde ModuleBuilder (https://github.com/PoshCode/ModuleBuilder) 
     manier van werken.
 
     - De module bevat een aantal scripts die handig kunnen zijn.
     - Sommige scripts zijn gebaseerd op tips & tricks van andere scripters wat in het script aangegeven wordt.
     - Voor meer details zie:
-        - https://github.com/gitoldi/PSModule-Personal
+        - https://github.com/gitoldi/CultuurhuysDeKroon
         - En gebruik 'Get-Help <command>' bij de individuele scripts.
 
 
 KEYWORDS
-      PowerShell, Module, Tools, personal
+      PowerShell, Module, Tools, personal, CultuurhuysDeKroon

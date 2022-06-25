@@ -23,6 +23,13 @@ CultuurhuysDeKroon (1.2.3) Test-ArrayVsHashtable      0.0.0   Has no (proper) pa
 
 ## Historie van wijzigingen
 
+### 0.2.0 ( 2022-06-25 )
+
+* _Aangepast_
+  * Kleine type fouten.
+  * Kleine cosmetische aanpassingen in een aantal script.
+  * Nog 2-3 'PSModule.ToDo' vervangen door 'CultuurhuysDeKroon'.
+
 ### 0.1.0 ( 2022-06-24 )
 
 * _Nieuw_
