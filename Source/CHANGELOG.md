@@ -23,6 +23,11 @@ CultuurhuysDeKroon (1.2.3) Test-ArrayVsHashtable      0.0.0   Has no (proper) pa
 
 ## Historie van wijzigingen
 
+### 0.3.0 ( 2022-06-25 )
+
+* _Nieuw_
+  * Convert-TicketmaticExcel - Converteer een Ticketmatic MS-Excel export en maak een kopie met kleuren.
+
 ### 0.2.0 ( 2022-06-25 )
 
 * _Aangepast_
